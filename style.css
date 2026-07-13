@@ -79,6 +79,7 @@ main{padding-top:28px;}
   font-size:14px;font-family:'Inter',sans-serif;
 }
 .field input:focus{outline:2px solid var(--sage-500);outline-offset:1px;}
+.field input.locked{background:var(--unavailable);color:var(--ink-soft);cursor:not-allowed;}
 
 .summary-box{
   display:flex;justify-content:space-between;align-items:center;

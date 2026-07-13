@@ -168,6 +168,20 @@ function paintCell(cell, adding) {
 function updateTotalHours() {
   const hours = (selected.size * SLOT_MINUTES) / 60;
   document.getElementById("totalHours").textContent = `${hours}시간`;
+  updateNameLockState();
+}
+
+/* 슬롯을 하나라도 선택한 상태에서는 이름을 바꿀 수 없도록 잠근다.
+   선택을 모두 해제하면 다시 이름을 입력/수정할 수 있다. */
+function updateNameLockState() {
+  const nameInput = document.getElementById("nameInput");
+  if (selected.size > 0) {
+    nameInput.readOnly = true;
+    nameInput.classList.add("locked");
+  } else {
+    nameInput.readOnly = false;
+    nameInput.classList.remove("locked");
+  }
 }
 
 /* 이름 입력란: 입력할 때마다 화면 갱신(잠금/라벨 반영),
@@ -252,6 +266,15 @@ document.getElementById("submitBtn").addEventListener("click", async () => {
 document.getElementById("surveyRefreshBtn").addEventListener("click", async () => {
   await loadBookings();
   renderSurveyCalendar();
+});
+
+document.getElementById("clearSelectionBtn").addEventListener("click", () => {
+  selected.clear();
+  updateTotalHours(); // 잠금도 함께 해제됨
+  renderSurveyCalendar();
+  const statusEl = document.getElementById("statusMsg");
+  statusEl.textContent = "선택이 초기화되었습니다. 이름을 다시 입력할 수 있습니다.";
+  statusEl.className = "status-msg";
 });
 
 /* =========================================================
