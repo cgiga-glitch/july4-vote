@@ -1,278 +1,87 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>7월 4일 점심 장소 투표 — CGI Holistic Fitness & Spa</title>
-<style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f5; color: #1a1a1a; min-height: 100vh; padding: 2rem 1rem; }
-  .wrap { max-width: 640px; margin: 0 auto; }
-  .page-header { margin-bottom: 2rem; }
-  .badge { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #185FA5; background: #E6F1FB; border-radius: 99px; padding: 4px 12px; margin-bottom: 12px; }
-  .page-header h1 { font-size: 22px; font-weight: 600; color: #1a1a1a; line-height: 1.3; margin-bottom: 6px; }
-  .page-header p { font-size: 14px; color: #666; }
-  .card { background: #fff; border-radius: 14px; border: 1px solid #e8e8e8; padding: 1.5rem; margin-bottom: 1rem; }
-  .input-row { display: flex; gap: 8px; margin-bottom: 12px; }
-  .input-row input { flex: 1; height: 42px; border: 1px solid #ddd; border-radius: 10px; padding: 0 14px; font-size: 15px; color: #1a1a1a; outline: none; transition: border-color 0.15s; }
-  .input-row input:focus { border-color: #378ADD; }
-  .btn-row { display: flex; gap: 8px; }
-  .btn { flex: 1; height: 42px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; border: 1.5px solid; transition: opacity 0.15s, transform 0.1s; }
-  .btn:active { transform: scale(0.98); }
-  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-  .btn-vote { background: #185FA5; color: #fff; border-color: #185FA5; }
-  .btn-vote:hover:not(:disabled) { background: #0c447c; border-color: #0c447c; }
-  .btn-cancel { background: #fff; color: #c0392b; border-color: #e8b4b0; }
-  .btn-cancel:hover:not(:disabled) { background: #fff5f5; }
-  .msg { font-size: 13px; min-height: 20px; margin-top: 10px; padding: 0 2px; display: flex; align-items: center; gap: 6px; }
-  .msg.err { color: #c0392b; }
-  .msg.ok { color: #1a7a4a; }
-  .msg.loading { color: #888; }
-  .spinner { width: 14px; height: 14px; border: 2px solid #ddd; border-top-color: #888; border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .section-label { font-size: 12px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: #999; margin-bottom: 12px; }
-  .option-card { border: 1.5px solid #e8e8e8; border-radius: 12px; padding: 14px 16px; cursor: pointer; background: #fff; transition: border-color 0.15s, background 0.1s; margin-bottom: 10px; }
-  .option-card:hover { border-color: #b5d4f4; background: #fafcff; }
-  .option-card.selected { border-color: #378ADD; background: #f0f7ff; }
-  .option-top { display: flex; align-items: flex-start; gap: 12px; }
-  .opt-num { width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid #ddd; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: #999; flex-shrink: 0; margin-top: 2px; transition: all 0.15s; }
-  .option-card.selected .opt-num { background: #378ADD; border-color: #378ADD; color: #fff; }
-  .opt-body { flex: 1; }
-  .opt-name { font-size: 15px; font-weight: 600; color: #1a1a1a; margin-bottom: 2px; }
-  .opt-meta { font-size: 12px; color: #888; margin-bottom: 5px; }
-  .opt-desc { font-size: 12px; color: #666; line-height: 1.55; }
-  .opt-rating { font-size: 13px; color: #888; white-space: nowrap; margin-left: auto; padding-left: 8px; }
-  .opt-detail { margin-top: 10px; margin-left: 40px; display: flex; flex-direction: column; gap: 4px; }
-  .opt-addr { font-size: 12px; color: #888; user-select: text; }
-  .opt-url-text { font-size: 12px; color: #185FA5; user-select: text; word-break: break-all; }
-  .opt-links { display: flex; gap: 12px; margin-top: 4px; }
-  .opt-links a { font-size: 12px; color: #185FA5; text-decoration: none; }
-  .opt-links a:hover { text-decoration: underline; }
-  .divider { border: none; border-top: 1px solid #ebebeb; margin: 1.5rem 0; }
-  .results-wrap { display: none; }
-  .result-row { margin-bottom: 18px; }
-  .result-name { font-size: 13px; font-weight: 600; color: #1a1a1a; margin-bottom: 6px; }
-  .bar-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 7px; }
-  .bar-track { flex: 1; height: 8px; background: #f0f0f0; border-radius: 99px; overflow: hidden; }
-  .bar-fill { height: 100%; background: #378ADD; border-radius: 99px; transition: width 0.5s ease; }
-  .bar-count { font-size: 12px; color: #888; white-space: nowrap; min-width: 65px; text-align: right; }
-  .voter-line { display: flex; flex-wrap: wrap; gap: 5px; min-height: 22px; }
-  .voter-tag { font-size: 12px; color: #555; background: #f4f4f4; border: 1px solid #e8e8e8; border-radius: 99px; padding: 2px 10px; }
-  .voter-none { font-size: 12px; color: #bbb; }
-  .live-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; color: #1a7a4a; background: #eaf6ef; border-radius: 99px; padding: 3px 10px; margin-left: 8px; }
-  .live-dot { width: 6px; height: 6px; border-radius: 50%; background: #1a7a4a; animation: pulse 1.5s infinite; }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-  .reset-btn { margin-top: 1.5rem; font-size: 12px; color: #bbb; background: none; border: none; cursor: pointer; text-decoration: underline; padding: 0; display: block; }
-  .reset-btn:hover { color: #888; }
-  .total-count { font-size: 13px; color: #888; margin-bottom: 1rem; }
-  .footer { text-align: center; font-size: 12px; color: #bbb; margin-top: 2.5rem; }
-  .last-updated { font-size: 11px; color: #bbb; text-align: right; margin-bottom: 12px; }
-</style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Vicky Oh 랙 홍보 지원 스케줄</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
 </head>
 <body>
-<div class="wrap">
-  <div class="page-header">
-    <div class="badge">CGI Holistic Fitness &amp; Spa</div>
-    <h1>7월 4일 Independence Day<br>점심 장소 투표</h1>
-    <p>가고 싶은 식당 하나를 선택해 주세요.</p>
-  </div>
-
-  <div class="card">
-    <div class="input-row">
-      <input type="text" id="voter-name" placeholder="이름 입력 (예: James Heo)" maxlength="30" />
-    </div>
-    <div class="btn-row">
-      <button class="btn btn-vote" id="btn-vote" onclick="submitVote()">투표하기</button>
-      <button class="btn btn-cancel" id="btn-cancel" onclick="cancelVote()">내 투표 취소</button>
-    </div>
-    <div class="msg" id="msg"></div>
-  </div>
-
-  <div class="section-label">식당 선택</div>
-  <div id="options-list"></div>
-
-  <div class="divider"></div>
-
-  <div class="results-wrap" id="results-wrap">
-    <div style="display:flex; align-items:center; margin-bottom:1rem;">
-      <span class="section-label" style="margin-bottom:0">현재 투표 현황</span>
-      <span class="live-badge"><span class="live-dot"></span> 실시간</span>
-    </div>
-    <div class="last-updated" id="last-updated"></div>
-    <div class="total-count" id="total-count"></div>
-    <div id="result-rows"></div>
-    <button class="reset-btn" onclick="resetAll()">전체 초기화 (관리자용)</button>
-  </div>
-
-  <div class="footer">CGI Holistic Fitness &amp; Spa &nbsp;·&nbsp; 111 Homans Ave, Closter, NJ 07624</div>
-</div>
-
-<script>
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwZZuWn-kaLVBDRjRtcBCHiJyppAfL_Vgf5kyKx_-50pPYj8fOhulPrzwAFdGwWTCN-/exec';
-
-const restaurants = [
-  { id:1, name:"UMI Hot Pot Sushi & Seafood Buffet", meta:"Middletown, NY · 해산물·스시·핫팟 뷔페", desc:"이 지역 최고 평점 뷔페. 해산물·스시·핫팟을 마음껏 즐길 수 있는 넓은 공간. 온라인 예약 가능. 7/4 11AM 오픈.", rating:"⭐ 4.7", addr:"360 NY-211, Middletown, NY 10940", web:"https://www.umibuffet.com", map:"https://share.google/USGwP2v4HQDVCOhbl" },
-  { id:2, name:"Oak & Reed", meta:"Middletown, NY · 창의적 미국 요리", desc:"파인다이닝급 음식을 캐주얼한 분위기에서. 그룹 이벤트 경험 풍부. Korean fried broccoli, 수제 콘브레드 인기 메뉴. 7/4 11:30AM 오픈.", rating:"⭐ 4.6", addr:"45-53 North St, Middletown, NY 10940", web:"https://www.oakandreeddowntown.com", map:"https://maps.app.goo.gl/yN2vmwnckq7AZhPn9" },
-  { id:3, name:"Cohen's Bakery & Cafe", meta:"Ellenville, NY · 캐주얼 베이커리 카페", desc:"아침·점심 전문 베이커리 카페. 팬케이크·오믈렛·페이스트리 인기. Tao Garden 이동 루트 상 위치. 7/4 6:30AM 오픈.", rating:"⭐ 4.5", addr:"89 Center St, Ellenville, NY 12428", web:"https://www.cohensbakery.cafe", map:"https://share.google/wfKz0yDEvHpTOsjKd" },
-  { id:4, name:"Namaste Indian Restaurant", meta:"Middletown, NY · 정통 인도 커리·탄두리", desc:"Middletown 최고 평점 인도 레스토랑. Chicken Tikka Masala·Tandoori Chicken 강추. 오너가 직접 테이블을 돌며 손님을 챙기는 따뜻한 서비스. 7/4 11AM 오픈.", rating:"⭐ 4.7", addr:"610 NY-211, Middletown, NY 10941", web:"https://www.namasteindiamiddletown.com/", map:"https://maps.app.goo.gl/W2FLPRjBERKfwfxR8" },
-  { id:5, name:"Cosimo's Brick Oven", meta:"Middletown, NY · 브릭오븐 피자·파스타·스테이크", desc:"이 지역 최다 리뷰 이탈리안. 브릭오븐 피자와 새우 스캠피 강추. 13명 단체 파티 등 그룹 이벤트 다수 경험. 와인·칵테일 바 보유. 7/4 11:30AM 오픈.", rating:"⭐ 4.5", addr:"620 NY-211, Middletown, NY 10941", web:"https://cosimosmiddletown.com/", map:"https://maps.app.goo.gl/pLAhXU2bWJrL2wCJ7" },
-];
-
-let selected = null;
-let pollInterval = null;
-
-function setLoading(on) {
-  document.getElementById('btn-vote').disabled = on;
-  document.getElementById('btn-cancel').disabled = on;
-}
-
-function showMsg(text, type) {
-  const el = document.getElementById('msg');
-  if (type === 'loading') {
-    el.innerHTML = `<div class="spinner"></div><span>${text}</span>`;
-  } else {
-    el.innerHTML = text;
-  }
-  el.className = 'msg' + (type && type !== 'loading' ? ' ' + type : (type === 'loading' ? ' loading' : ''));
-}
-
-function api(params) {
-  const url = SCRIPT_URL + '?' + new URLSearchParams(params).toString();
-  return fetch(url, { method: 'POST', body: JSON.stringify(params), headers: { 'Content-Type': 'text/plain' } })
-    .then(r => r.json());
-}
-
-function renderOptions() {
-  document.getElementById('options-list').innerHTML = restaurants.map(r => `
-    <div class="option-card${selected===r.id?' selected':''}" onclick="selectOption(${r.id})">
-      <div class="option-top">
-        <div class="opt-num">${r.id}</div>
-        <div class="opt-body">
-          <div class="opt-name">${r.name}</div>
-          <div class="opt-meta">${r.meta}</div>
-          <div class="opt-desc">${r.desc}</div>
+  <div class="page">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark">VO</span>
+        <div class="brand-text">
+          <h1>랙 홍보 지원 스케줄</h1>
+          <p>Vicky Oh 본부 방문 지원 &middot; 6/14&ndash;6/16</p>
         </div>
-        <div class="opt-rating">${r.rating}</div>
       </div>
-      <div class="opt-detail">
-        <div class="opt-addr">📍 ${r.addr}</div>
-        ${r.web ? `<div class="opt-url-text">🌐 ${r.web}</div>` : ''}
-        ${(r.web||r.map) ? `<div class="opt-links">
-          ${r.web?`<a href="${r.web}" target="_blank">↗ 웹사이트</a>`:''}
-          ${r.map?`<a href="${r.map}" target="_blank">↗ 지도</a>`:''}
-        </div>` : ''}
-      </div>
-    </div>`).join('');
-}
+      <nav class="tabs">
+        <button class="tab-btn active" data-tab="survey">설문 참여</button>
+        <button class="tab-btn" data-tab="dashboard">대시보드</button>
+      </nav>
+    </header>
 
-function selectOption(id) {
-  selected = id;
-  showMsg('', '');
-  renderOptions();
-}
+    <main>
+      <!-- ===== SURVEY TAB ===== -->
+      <section id="survey" class="tab-panel active">
+        <div class="panel-grid">
+          <div class="card intro-card">
+            <h2>안내</h2>
+            <p>본부에서 Vicky Oh님이 랙 홍보를 도와주기 위해 방문합니다. 아래 시간 중 <strong>도와줄 수 있는 시간대를 캘린더에서 드래그</strong>하여 선택해 주세요.</p>
+            <ul class="legend">
+              <li><span class="dot available"></span> 지원 가능 시간</li>
+              <li><span class="dot selected"></span> 내가 선택한 시간</li>
+              <li><span class="dot taken"></span> 다른 사람이 선택함</li>
+              <li><span class="dot unavailable"></span> 해당 없음</li>
+            </ul>
+            <div class="field">
+              <label for="nameInput">이름</label>
+              <input id="nameInput" type="text" placeholder="이름을 입력하세요" autocomplete="off" />
+            </div>
+            <div class="summary-box">
+              <span class="summary-label">선택한 총 시간</span>
+              <span id="totalHours" class="summary-value">0시간</span>
+            </div>
+            <button id="submitBtn" class="primary-btn">제출하기</button>
+            <button id="surveyRefreshBtn" class="ghost-btn" style="width:100%;margin-top:8px;">현황 새로고침</button>
+            <p id="statusMsg" class="status-msg"></p>
+            <p class="hint">* 한 슬롯은 한 사람만 선택할 수 있습니다. 이미 다른 사람이 선택한 시간은 잠겨서 표시됩니다.</p>
+            <p class="hint">* 이름을 입력하고 캘린더 밖을 클릭하면(포커스 아웃) 이전에 저장했던 내 시간이 자동으로 불러와집니다.</p>
+          </div>
 
-async function submitVote() {
-  const name = document.getElementById('voter-name').value.trim();
-  if (!name) { showMsg('이름을 입력해 주세요.', 'err'); return; }
-  if (!selected) { showMsg('식당을 선택해 주세요.', 'err'); return; }
-  setLoading(true);
-  showMsg('투표 중...', 'loading');
-  try {
-    const r = restaurants.find(r => r.id === selected);
-    const res = await api({ action: 'vote', name, restaurantId: selected, restaurantName: r.name });
-    if (res.status === 'ok') {
-      showMsg(`${name}님 투표 완료!`, 'ok');
-      document.getElementById('voter-name').value = '';
-      selected = null;
-      renderOptions();
-      await loadResults();
-    } else if (res.status === 'duplicate') {
-      showMsg(`${name}님은 이미 투표하셨습니다. 취소 후 다시 투표해 주세요.`, 'err');
-    } else {
-      showMsg('오류가 발생했습니다. 다시 시도해 주세요.', 'err');
-    }
-  } catch(e) {
-    showMsg('연결 오류. 다시 시도해 주세요.', 'err');
-  }
-  setLoading(false);
-}
+          <div class="card calendar-card">
+            <div id="calendarGrid" class="calendar"></div>
+          </div>
+        </div>
+      </section>
 
-async function cancelVote() {
-  const name = document.getElementById('voter-name').value.trim();
-  if (!name) { showMsg('취소할 이름을 입력해 주세요.', 'err'); return; }
-  setLoading(true);
-  showMsg('취소 중...', 'loading');
-  try {
-    const res = await api({ action: 'cancel', name });
-    if (res.status === 'cancelled') {
-      showMsg(`${name}님의 투표가 취소되었습니다.`, 'ok');
-      document.getElementById('voter-name').value = '';
-      await loadResults();
-    } else if (res.status === 'not_found') {
-      showMsg(`${name}님의 투표 내역이 없습니다.`, 'err');
-    } else {
-      showMsg('오류가 발생했습니다.', 'err');
-    }
-  } catch(e) {
-    showMsg('연결 오류. 다시 시도해 주세요.', 'err');
-  }
-  setLoading(false);
-}
+      <!-- ===== DASHBOARD TAB ===== -->
+      <section id="dashboard" class="tab-panel">
+        <div class="dash-toolbar">
+          <button id="refreshBtn" class="ghost-btn">새로고침</button>
+          <span id="lastUpdated" class="muted"></span>
+        </div>
+        <div class="panel-grid">
+          <div class="card">
+            <h2>시간대별 예약 현황</h2>
+            <div id="heatmap" class="calendar heatmap"></div>
+          </div>
+          <div class="card">
+            <h2>인원별 누적 시간</h2>
+            <table class="people-table">
+              <thead><tr><th>이름</th><th>총 시간</th></tr></thead>
+              <tbody id="peopleTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
 
-async function loadResults() {
-  try {
-    const res = await api({ action: 'getVotes' });
-    if (res.status === 'ok') {
-      renderResults(res.votes);
-      const now = new Date();
-      document.getElementById('last-updated').textContent = `마지막 업데이트: ${now.toLocaleTimeString('ko-KR')}`;
-    }
-  } catch(e) {}
-}
-
-function renderResults(votes) {
-  const counts = {}, votersByOpt = {};
-  restaurants.forEach(r => { counts[r.id] = 0; votersByOpt[r.id] = []; });
-  votes.forEach(v => {
-    counts[v.restaurantId] = (counts[v.restaurantId] || 0) + 1;
-    if (!votersByOpt[v.restaurantId]) votersByOpt[v.restaurantId] = [];
-    votersByOpt[v.restaurantId].push(v.name);
-  });
-  const total = votes.length;
-
-  document.getElementById('total-count').textContent = `총 ${total}명 투표`;
-  document.getElementById('result-rows').innerHTML = restaurants.map(r => {
-    const pct = total ? Math.round(counts[r.id] / total * 100) : 0;
-    const voterTags = votersByOpt[r.id] && votersByOpt[r.id].length
-      ? votersByOpt[r.id].map(n => `<span class="voter-tag">${n}</span>`).join('')
-      : `<span class="voter-none">없음</span>`;
-    return `<div class="result-row">
-      <div class="result-name">${r.id}. ${r.name}</div>
-      <div class="bar-wrap">
-        <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
-        <div class="bar-count">${counts[r.id]}표 (${pct}%)</div>
-      </div>
-      <div class="voter-line">${voterTags}</div>
-    </div>`;
-  }).join('');
-
-  document.getElementById('results-wrap').style.display = 'block';
-}
-
-async function resetAll() {
-  if (!confirm('전체 투표를 초기화하시겠습니까?')) return;
-  setLoading(true);
-  try {
-    await api({ action: 'reset' });
-    await loadResults();
-    showMsg('초기화 완료.', 'ok');
-  } catch(e) {}
-  setLoading(false);
-}
-
-renderOptions();
-loadResults();
-pollInterval = setInterval(loadResults, 10000);
-</script>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
