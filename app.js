@@ -247,14 +247,16 @@ document.getElementById("submitBtn").addEventListener("click", async () => {
         .join(", ");
       statusEl.textContent = `일부 시간은 이미 다른 사람이 선택해 저장되지 않았습니다: ${conflictTxt}`;
       statusEl.className = "status-msg err";
-      // 충돌난 슬롯은 로컬 선택에서도 제거
-      data.conflicts.forEach((c) => selected.delete(slotKey(c.date, c.start)));
     } else {
-      statusEl.textContent = `제출 완료 (총 ${(data.saved.length * SLOT_MINUTES) / 60}시간)`;
+      statusEl.textContent = `${name}님, 제출 완료 (총 ${(data.saved.length * SLOT_MINUTES) / 60}시간)`;
       statusEl.className = "status-msg ok";
     }
+
+    // 다음 사람이 바로 이어서 입력할 수 있도록 이름/선택을 초기화하고 잠금을 해제
+    selected.clear();
+    nameInput.value = "";
     renderSurveyCalendar();
-    updateTotalHours();
+    updateTotalHours(); // 잠금 해제 포함
   } catch (err) {
     statusEl.textContent = "제출 실패: " + err.message + " (config.js의 URL을 확인하세요)";
     statusEl.className = "status-msg err";
