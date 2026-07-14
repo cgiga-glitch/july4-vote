@@ -241,6 +241,12 @@ document.getElementById("submitBtn").addEventListener("click", async () => {
 
     await loadBookings(); // 최신 예약 현황 다시 불러오기
 
+    // 방금 저장된 슬롯은 서버 재조회 결과와 무관하게 즉시 반영해
+    // 이름이 슬롯에서 사라지지 않도록 보장한다.
+    (data.saved || []).forEach((s) => {
+      bookedMap[slotKey(s.date, s.start)] = name;
+    });
+
     if (data.conflicts && data.conflicts.length > 0) {
       const conflictTxt = data.conflicts
         .map((c) => `${c.date} ${c.start} (${c.owner})`)
